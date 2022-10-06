@@ -26,29 +26,35 @@ const Fractionalize = () => {
               </div>
               <div className="w-96 flex my-8">
 
-                {/* <h4 className="text-gray-800 font-bold mt-8"></h4> */}
-                <input className="form-control
-        block
-        w-2/3
-        px-3
-        py-3
-        text-base
-        font-normal
-        text-gray-700
-        bg-white bg-clip-padding
-        border border-solid border-gray-300
-        rounded
-        transition
-        ease-in-out
-        m-auto
-        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" id="fraction-num" type={'number'} placeholder="Set number of fractions"></input>
+                <input
+                  id="fraction-num" type={'number'} placeholder="Set number of fractions"
+                  className="
+                    form-control
+                    block
+                    w-2/3
+                    px-3
+                    py-3
+                    text-base
+                    font-normal
+                    text-gray-700
+                    bg-white bg-clip-padding
+                    border border-solid border-gray-300
+                    rounded
+                    transition
+                    ease-in-out
+                    m-auto
+                    focus:text-gray-700
+                    focus:bg-white
+                    focus:border-blue-600
+                    focus:outline-none"
+                />
               </div>
             </div>
             <div>
               <div className="flex items-center justify-start">
                 <div
                   className={`w-44 h-14 m-auto md:ml-24 rounded-full cursor-pointer hover:scale-125 ${state === 'Init' ? 'bg-green-500' : 'bg-orange-500'} text-white flex items-center justify-center`}
-                  onClick={() => {state === 'Init' ? setState('Loading') : setState('Init')}}
+                  onClick={() => { state === 'Init' ? setState('Loading') : setState('Init') }}
                 >
                   {state === 'Init' ?
                     <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="check-circle" className="w-14 h-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -63,20 +69,11 @@ const Fractionalize = () => {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                   </svg>
                 </Link>
-                {/* <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-10 h-10 hover:scale-110">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
-                </svg> */}
               </div>
             </div>
           </div>
         </div>
       </div>
-
-
-
-      {/* <button type="button" className="flex flex-row items-center px-10 py-4 text-base font-medium text-center text-white transition duration-500 ease-in-out transform bg-blue-600 rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" disabled>
-        Processing...
-      </button> */}
     </>} />
   </>
 };
