@@ -43,7 +43,7 @@ const Unlock = () => {
   const assetName = () => unit ? Buffer.from(unit.slice(56), 'hex').toString('ascii') : null
 
   return <>
-    <FracadaAction key="unlock" action="Unlock" children={<>
+    <FracadaAction key="unlock" action="Unlock">
       <div className="flex w-full items-center px-6 justify-center">
         <div>
           <div className="flex flex-col justify-between bg-white rounded-lg drop-shadow-sm mb-6 py-5 px-4">
@@ -67,7 +67,7 @@ const Unlock = () => {
           </div>
         </div>
       </div>
-    </>} />
+    </FracadaAction>
   </>
 };
 

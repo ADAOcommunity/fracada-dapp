@@ -21,11 +21,14 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
   const [failed, setFailed] = useState<boolean>(false)
   const [assets, setAssets] = useState<Asset[]>([])
   const [filteredAssets, setFilteredAssets] = useState<Asset[]>([])
+
   const walletAddress = useWalletStore((s) => s.address)
   const walletName = useWalletStore((s) => s.walletName)
+
   const setAsset = useAssetStore((s) => s.setAsset)
   const setImage = useAssetStore((s) => s.setImage)
   const cancelUnit = useAssetStore((s) => s.cancelUnit)
+  
   const isConnected = (walletAddress && walletName) ? true : false
 
   //FOR TESTING
