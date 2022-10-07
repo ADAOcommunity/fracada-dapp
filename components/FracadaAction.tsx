@@ -3,6 +3,7 @@ import buffer from 'buffer'
 import initializeLucid from "../utils/initializeLucid";
 import { ReactNode, useEffect, useState } from "react";
 import { DebounceInput } from 'react-debounce-input';
+import { Loader } from "./Loader";
 
 const Buffer = buffer.Buffer
 
@@ -16,15 +17,35 @@ const ARWEAVE_GATEWAY = 'https://arweave.net/'
 
 const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unlock' | 'Fractionalize' }) => {
   const [chosenUnit, setChosenUnit] = useState<string | undefined>(undefined)
+  const [loading, setLoading] = useState<boolean>(false)
   const [assets, setAssets] = useState<Asset[]>([])
   const [filteredAssets, setFilteredAssets] = useState<Asset[]>([])
-  const walletStore = useWalletStore()
-  const assetStore = useAssetStore()
-  const isConnected = (walletStore.address && walletStore.walletName) ? true : false
+  const walletAddress = useWalletStore((s) => s.address)
+  const walletName = useWalletStore((s) => s.walletName)
+  const setAsset = useAssetStore((s) => s.setAsset)
+  const setImage = useAssetStore((s) => s.setImage)
+  const cancelUnit = useAssetStore((s) => s.cancelUnit)
+  const isConnected = (walletAddress && walletName) ? true : false
+
+
+  function delay(milliseconds: number) {
+    return new Promise(resolve => {
+      setTimeout(resolve, milliseconds);
+    });
+  }
+
+  const getNftToUnlock = async (fractionUnit: string) => {
+
+    //HERE WE SHOULD LOOK FOR MINTING TX AND GET LOCKED UNIT
+    await delay(600)
+
+    return Promise.resolve('d5e6bf0500378d4f0da4e8dde6becec7621cd8cbf5cbb9b87013d4cc5370616365427564323536')
+  }
 
   useEffect(() => {
     if (isConnected) loadAssets()
-  }, [walletStore.walletName])
+    return () => cancelUnit()
+  }, [walletName])
 
   const filterAssets = (filterString: string) => {
     let count = 0
@@ -40,32 +61,39 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
   }
 
   const chooseAsset = async (unit: string) => {
-    setChosenUnit(unit)
-    assetStore.setAsset(unit)
-    const bfAsset = (await (await fetch(`https://cardano-mainnet.blockfrost.io/api/v0/assets/${unit}`, {
-      headers: {
-        'project_id': 'mainnetxIyVZQ4yaAvofGroMlHEYqGPJr1uFVmW'
+    setLoading(true)
+    try {
+      if (action === 'Unlock') {
+        unit = await getNftToUnlock(unit)
       }
-    })).json())
+      setChosenUnit(unit)
+      setAsset(unit)
+      const bfAsset = (await (await fetch(`https://cardano-mainnet.blockfrost.io/api/v0/assets/${unit}`, {
+        headers: {
+          'project_id': 'mainnetxIyVZQ4yaAvofGroMlHEYqGPJr1uFVmW'
+        }
+      })).json())
 
-    if (bfAsset.metadata && bfAsset.metadata.logo) {
-      assetStore.setImage('data:image/png;base64, ' + bfAsset.metadata.logo)
-    } else if (bfAsset.onchain_metadata && bfAsset.onchain_metadata.image) {
-      if (bfAsset.onchain_metadata.image.includes('ipfs://') || bfAsset.onchain_metadata.image.includes('ipfs/')) {
-        assetStore.setImage(
-          IPFS_GATEWAY + (bfAsset.onchain_metadata.image as string).replace('ipfs/', '').replace('ipfs://', '')
-        )
-      } else if (bfAsset.onchain_metadata.image.includes('ar://') || bfAsset.onchain_metadata.image.includes('ar/')) {
-        assetStore.setImage(
-          ARWEAVE_GATEWAY + (bfAsset.onchain_metadata.image as string).replace('ar/', '').replace('ar://', '')
-        )
+      if (bfAsset.metadata && bfAsset.metadata.logo) {
+        setImage('data:image/png;base64, ' + bfAsset.metadata.logo)
+      } else if (bfAsset.onchain_metadata && bfAsset.onchain_metadata.image) {
+        if (bfAsset.onchain_metadata.image.includes('ipfs://') || bfAsset.onchain_metadata.image.includes('ipfs/')) {
+          setImage(
+            IPFS_GATEWAY + (bfAsset.onchain_metadata.image as string).replace('ipfs/', '').replace('ipfs://', '')
+          )
+        } else if (bfAsset.onchain_metadata.image.includes('ar://') || bfAsset.onchain_metadata.image.includes('ar/')) {
+          setImage(
+            ARWEAVE_GATEWAY + (bfAsset.onchain_metadata.image as string).replace('ar/', '').replace('ar://', '')
+          )
+        }
       }
-    }
+    } catch { }
+    setLoading(false)
   }
 
   const loadAssets = async () => {
-    if (!walletStore.walletName) throw 'Wallet not connnected. Can not load assets.'
-    const lucid = await initializeLucid(await window.cardano[walletStore.walletName].enable())
+    if (!walletName) throw 'Wallet not connnected. Can not load assets.'
+    const lucid = await initializeLucid(await window.cardano[walletName].enable())
     const utxos = await lucid.wallet.getUtxos()
 
     const allAssets: Map<string, Asset> = new Map<string, Asset>()
@@ -88,7 +116,8 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
     }
   }
 
-  return <>
+
+  return loading ? <Loader dark={true} /> : <>
     {!isConnected ?
       <div className={'absolute bottom-[265px] text-2xl md:right-60 md:text-4xl'}><h3>Connect a wallet to {action} → </h3></div> :
       <>
@@ -111,14 +140,16 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
                   }}
                 />
               </div>
-
               <ul className="rounded-md shadow-md bg-white absolute left-0 right-0 -bottom-18 mt-3 p-3">
                 {filteredAssets.map(a =>
                   <AssetItem
                     key={a.policyId + a.assetName}
                     assetName={a.assetName}
                     policyId={a.policyId}
-                    onClick={() => chooseAsset(a.policyId + Buffer.from(a.assetName, 'ascii').toString('hex'))}
+                    onClick={() => {
+                      chooseAsset(a.policyId + Buffer.from(a.assetName, 'ascii').toString('hex'))
+                    }
+                    }
                   />
                 )}
               </ul>
