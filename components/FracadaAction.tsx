@@ -44,9 +44,11 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
 
       //FOR TESTING:
       //FAILING LESS THEN HALF THE TIMES
-      if(Math.random() < 0.4) 
+      if(Math.random() < 0.4) {
+        await delay(1000)
         throw 'Dapp not ready. Failed searching for related unit.'
-
+      }
+      
       //RANDOM SPACEBUD
       return Promise.resolve('d5e6bf0500378d4f0da4e8dde6becec7621cd8cbf5cbb9b87013d4cc5370616365427564323536')
     }
