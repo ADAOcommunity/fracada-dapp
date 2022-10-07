@@ -17,15 +17,17 @@ const useWalletStore = create<WalletStore>((set) => ({
 type AssetStore = {
   unit: null | string,
   image: null | string,
-  setAsset: (unit: string, image?: string) => void,
+  setAsset: (unit: string) => void,
+  setImage: (image: string) => void,
   cancelUnit: () => void
 }
 
 const useAssetStore = create<AssetStore>((set) => ({
   unit: null,
   image: null,
-  setAsset: (unit: string, image?: string) => set({ unit, image }),
-  cancelUnit: () => set({unit: null, image: undefined}),
+  setAsset: (unit: string) => set({ unit, image: null }),
+  setImage: (image: string) => set((s) => { return { image, unit: s.unit }}),
+  cancelUnit: () => set({unit: null, image: null}),
 }))
 
 export { useWalletStore, useAssetStore }

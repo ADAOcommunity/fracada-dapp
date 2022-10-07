@@ -41,7 +41,7 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
 
   const chooseAsset = async (unit: string) => {
     setChosenUnit(unit)
-
+    assetStore.setAsset(unit)
     const bfAsset = (await (await fetch(`https://cardano-mainnet.blockfrost.io/api/v0/assets/${unit}`, {
       headers: {
         'project_id': 'mainnetxIyVZQ4yaAvofGroMlHEYqGPJr1uFVmW'
@@ -49,16 +49,14 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
     })).json())
 
     if (bfAsset.metadata && bfAsset.metadata.logo) {
-      assetStore.setAsset(unit, 'data:image/png;base64, ' + bfAsset.metadata.logo)
+      assetStore.setImage('data:image/png;base64, ' + bfAsset.metadata.logo)
     } else if (bfAsset.onchain_metadata && bfAsset.onchain_metadata.image) {
       if (bfAsset.onchain_metadata.image.includes('ipfs://') || bfAsset.onchain_metadata.image.includes('ipfs/')) {
-        assetStore.setAsset(
-          unit,
+        assetStore.setImage(
           IPFS_GATEWAY + (bfAsset.onchain_metadata.image as string).replace('ipfs/', '').replace('ipfs://', '')
         )
       } else if (bfAsset.onchain_metadata.image.includes('ar://') || bfAsset.onchain_metadata.image.includes('ar/')) {
-        assetStore.setAsset(
-          unit,
+        assetStore.setImage(
           ARWEAVE_GATEWAY + (bfAsset.onchain_metadata.image as string).replace('ar/', '').replace('ar://', '')
         )
       }

@@ -4,11 +4,17 @@ import { useAssetStore } from "../utils/store";
 import FracadaAction from "./FracadaAction";
 
 const Fractionalize = () => {
-  const [state, setState] = useState<'Init' | 'Loading' | 'Error' | 'Success'>('Init')
+  const [state, setState] = useState<'Init' | 'Loading' | 'Success'>('Init')
   const [fractions, setFractions] = useState<number>(0)
 
 
-  const [error, setError] = useState<number>(0)
+  const [error, setError] = useState<string | null>(null)
+
+  const showErr = (err: string) => {
+    setError(err)
+    setTimeout(() => setError(null), 4000)
+
+  }
 
   const assetStore = useAssetStore()
   const policyId = () => assetStore.unit?.slice(0, 56)
@@ -24,7 +30,11 @@ const Fractionalize = () => {
             <div className="flex flex-col md:flex-row-reverse">
               <div className="flex flex-col items-center">
                 <Link target={'_blank'} href={`https://cardanoscan.io/token/${assetStore.unit}`}>
-                  <img className="w-80 h-80 rounded-lg drop-shadow-sm cursor-pointer hover:scale-110" src={assetStore.image ? assetStore.image : ""}></img>
+                  {assetStore.image ?
+                    <img className="w-80 h-80 rounded-lg drop-shadow-sm cursor-pointer hover:scale-110" src={assetStore.image ? assetStore.image : ""}></img>
+                    :
+                    <div className="w-80 h-80 animate-pulse rounded-lg drop-shadow-sm bg-gray-300 cursor-pointer hover:scale-110"></div>
+                  }
                 </Link>
                 <div className="w-80 break-all">
                   <Link target={'_blank'} href={`https://cardanoscan.io/token/${assetStore.unit}`}>
@@ -35,7 +45,7 @@ const Fractionalize = () => {
                   </Link>
                 </div>
               </div>
-              <div className="w-96 flex my-8">
+              <div className="w-96 flex my-8 flex-col">
 
                 <input
                   id="fraction-num"
@@ -63,6 +73,9 @@ const Fractionalize = () => {
                     focus:border-blue-600
                     focus:outline-none"
                 />
+                <p className="mx-auto font-medium text-red-500 px-8">
+                  {error || ''}
+                </p>
               </div>
             </div>
             <div>
@@ -78,20 +91,30 @@ const Fractionalize = () => {
                     }
                     onClick={() => {
                       if (state === 'Init') {
+                        setError(null)
                         setState('Loading')
-                        setTimeout(() => setState('Success'), 1000)
+                        // setTimeout(() => setState('Success'), 1000)
+                        setTimeout(() => {
+                          setState('Init')
+                          setError(`Failed fractionalizing`)
+                          // setError(`Failed canceling
+                          // // <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="check-circle" className="w-14 h-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                          // //   <path fill="currentColor" d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"></path>
+                          // // </svg>
+                          // `)
+                        }, 1000)
                       } else {
                         setState('Init')
                       }
                     }}
                   >
-                      {state === 'Init' ?
-                        'FRACTIONALIZE' :
-                        // <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="check-circle" className="w-14 h-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                        //   <path fill="currentColor" d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"></path>
-                        // </svg> :
-                        <svg className="animate-spin w-14 h-" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="200px" height="200px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><circle cx="50" cy="50" fill="none" stroke="#ffffff" strokeWidth="10" r="35" strokeDasharray="164.93361431346415 56.97787143782138" transform="matrix(1,0,0,1,0,0)" ></circle></svg>
-                      }
+                    {state === 'Init' ?
+                      'FRACTIONALIZE' :
+                      // <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="check-circle" className="w-14 h-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                      //   <path fill="currentColor" d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"></path>
+                      // </svg> :
+                      <svg className="animate-spin w-14 h-" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="200px" height="200px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><circle cx="50" cy="50" fill="none" stroke="#ffffff" strokeWidth="10" r="35" strokeDasharray="164.93361431346415 56.97787143782138" transform="matrix(1,0,0,1,0,0)" ></circle></svg>
+                    }
                   </button>
                 }
                 <Link href="/">
