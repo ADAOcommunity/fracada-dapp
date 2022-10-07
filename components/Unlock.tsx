@@ -1,8 +1,8 @@
-import Action from "./Action";
+import FracadaAction from "./FracadaAction";
 
 const Unlock = () => {
     return <>
-      <Action action="Unlock" children={<></>}/>
+      <FracadaAction action="Unlock" children={<></>}/>
     </>
 };
 

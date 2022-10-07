@@ -14,7 +14,7 @@ type Asset = {
 const IPFS_GATEWAY = 'https://cloudflare-ipfs.com/ipfs/'
 const ARWEAVE_GATEWAY = 'https://arweave.net/'
 
-const Action = ({ children, action }: { children: ReactNode, action: 'Unlock' | 'Fractionalize' }) => {
+const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unlock' | 'Fractionalize' }) => {
   const [chosenUnit, setChosenUnit] = useState<string | undefined>(undefined)
   const [assets, setAssets] = useState<Asset[]>([])
   const [filteredAssets, setFilteredAssets] = useState<Asset[]>([])
@@ -135,7 +135,7 @@ const Action = ({ children, action }: { children: ReactNode, action: 'Unlock' | 
   </>;
 };
 
-export default Action
+export default FracadaAction
 
 
 
