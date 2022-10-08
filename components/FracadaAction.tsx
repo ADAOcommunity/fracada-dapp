@@ -59,7 +59,7 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
       setFailed(true)
     }
 
-    return 'none'
+    return ''
   }
 
   useEffect(() => {
