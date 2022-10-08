@@ -28,7 +28,7 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
   const setAsset = useAssetStore((s) => s.setAsset)
   const setImage = useAssetStore((s) => s.setImage)
   const cancelUnit = useAssetStore((s) => s.cancelUnit)
-  
+
   const isConnected = (walletAddress && walletName) ? true : false
 
   //FOR TESTING
@@ -86,7 +86,8 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
       if (action === 'Unlock') {
         const newUnit = await getNftToUnlock(unit)
 
-        if(newUnit) unit = newUnit
+        if(!newUnit) throw 'Could not find associated locked asset.'
+        else unit = newUnit
       }
       setChosenUnit(unit)
       setAsset(unit)
@@ -109,7 +110,7 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
           )
         }
       }
-    } catch { }
+    } catch(ex) { console.log(ex) }
     setLoading(false)
   }
 
