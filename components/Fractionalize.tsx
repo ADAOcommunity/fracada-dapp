@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useAssetStore } from "../utils/store";
 import { ActionBottom } from "./ActionBottom";
-import FracadaAction from "./FracadaAction";
 import { Nft } from "./Nft";
 
 const Fractionalize = () => {
@@ -48,7 +47,6 @@ const Fractionalize = () => {
   const assetName = () => unit ? Buffer.from(unit.slice(56), 'hex').toString('ascii') : ''
 
   return <>
-    <FracadaAction key="Fractionalize" action="Fractionalize">
       <div className="flex w-full items-center px-6 justify-center">
         <div>
           <div className="flex flex-col justify-between bg-white rounded-lg drop-shadow-sm mb-6 py-5 px-4">
@@ -91,7 +89,6 @@ const Fractionalize = () => {
           </div>
         </div>
       </div>
-    </FracadaAction>
   </>
 };
 
