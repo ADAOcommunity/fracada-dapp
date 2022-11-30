@@ -4,6 +4,7 @@ import initializeLucid from "../utils/initializeLucid";
 import { ReactNode, useEffect, useState } from "react";
 import { DebounceInput } from 'react-debounce-input';
 import { Loader } from "./Loader";
+import { BLOCKFROST_API_URL, BLOCKFROST_PROJECT_ID } from "../utils/envs";
 
 const Buffer = buffer.Buffer
 
@@ -91,9 +92,9 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
       }
       setChosenUnit(unit)
       setAsset(unit)
-      const bfAsset = (await (await fetch(`https://cardano-mainnet.blockfrost.io/api/v0/assets/${unit}`, {
+      const bfAsset = (await (await fetch(`${BLOCKFROST_API_URL}/assets/${unit}`, {
         headers: {
-          'project_id': 'mainnetxIyVZQ4yaAvofGroMlHEYqGPJr1uFVmW'
+          'project_id': BLOCKFROST_PROJECT_ID
         }
       })).json())
 
