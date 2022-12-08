@@ -218,10 +218,10 @@ const AssetItem = ({ assetName, policyId, onClick }: { assetName: string, policy
 
 const LoadingItems = ({currentCount}: {currentCount: number | undefined}) => {
 
-  const isTimeout = useSearchStore((s) => s.isTimeout);
-  const messageTitle = useSearchStore((s) => s.messageTitle);
-  const message = useSearchStore((s) => s.message);
-  const setIsTimeout = useSearchStore((s) => s.setIsTimeout);
+  const isTimeout = useSearchStore((s) => s.isTimeout)
+  const messageTitle = useSearchStore((s) => s.messageTitle)
+  const message = useSearchStore((s) => s.message)
+  const setIsTimeout = useSearchStore((s) => s.setIsTimeout)
 
   const loadTimeoutMessage = () => {
     if(!currentCount || currentCount == 0){
