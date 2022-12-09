@@ -1,4 +1,4 @@
-import { useAssetStore, useWalletStore } from "../utils/store";
+import { useAssetStore, useWalletStore, useSearchStore } from "../utils/store";
 import buffer from 'buffer'
 import initializeLucid from "../utils/initializeLucid";
 import { ReactNode, useEffect, useState } from "react";
@@ -169,7 +169,11 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
                   />
                 </div>
                 <ul className="rounded-md shadow-md bg-white absolute left-0 right-0 -bottom-18 mt-3 p-3">
-                  {filteredAssets.map(a =>
+                  {
+                    filteredAssets?.length == 0 && <LoadingItems currentCount={filteredAssets?.length} />
+                  }
+
+                  {filteredAssets?.length >= 0 && filteredAssets.map(a =>
                     <AssetItem
                       key={a.policyId + a.assetName}
                       assetName={a.assetName}
@@ -206,6 +210,41 @@ const AssetItem = ({ assetName, policyId, onClick }: { assetName: string, policy
         <h3 className="text-gray-900 font-medium text-md">{assetName}</h3>
         <div className="text-gray-600 mt-1 font-regular text-sm break-all">
           {policyId}
+        </div>
+      </div>
+    </li>
+  </>
+}
+
+const LoadingItems = ({currentCount}: {currentCount: number | undefined}) => {
+
+  const isTimeout = useSearchStore((s) => s.isTimeout)
+  const messageTitle = useSearchStore((s) => s.messageTitle)
+  const message = useSearchStore((s) => s.message)
+  const setIsTimeout = useSearchStore((s) => s.setIsTimeout)
+
+  const loadTimeoutMessage = () => {
+    if(!currentCount || currentCount == 0){
+      setIsTimeout()
+    }
+  }
+
+  useEffect(() => {
+    const _t = setTimeout(loadTimeoutMessage, 5000)
+    return () => !!_t && clearTimeout(_t);
+  }, [])
+
+  const leftIcon = isTimeout ? <span>{':('}</span> : <img src='/assetitem.png' className={'w-5 h-5 md:w-8 md:h-8'} />
+
+  return <>
+    <li className="grid grid-cols-10 gap-4 min-w-full justify-center items-center px-4 py-2 rounded-lg hover:bg-gray-50">
+      <div className="flex justify-center items-center min-w-full">
+        {leftIcon}
+      </div>
+      <div className="col-start-2 col-end-11 pl-8 border-l-2 border-solid border-gray break-all">
+        <h3 className="text-gray-900 font-medium text-md">{messageTitle}</h3>
+        <div className="text-gray-600 mt-1 font-regular text-sm break-all">
+          {message}
         </div>
       </div>
     </li>

@@ -30,4 +30,25 @@ const useAssetStore = create<AssetStore>((set) => ({
   cancelUnit: () => set({unit: null, image: null}),
 }))
 
-export { useWalletStore, useAssetStore }
+type SearchStore = {
+  totalResults: number,
+  isTimeout: boolean,
+  messageTitle: string,
+  message: string,
+  setTotalResults: (count: number)  => void,
+  setIsTimeout: () => void
+}
+
+const useSearchStore = create<SearchStore>((set) => ({
+  totalResults: 0,
+  isTimeout: false,
+  messageTitle: "Loading...",
+  message: "Please wait while we load assets from your wallet.",
+  setIsTimeout: () => set({
+    isTimeout: true,
+    messageTitle: "No assets found",
+    message: "We were not able to find any native assets on this wallet."}),
+  setTotalResults: (count: number) => set({totalResults: count})
+}))
+
+export { useWalletStore, useAssetStore, useSearchStore }
