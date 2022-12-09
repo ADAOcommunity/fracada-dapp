@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useAssetStore } from "../utils/store";
 import { ActionBottom } from "./ActionBottom";
 import { Nft } from "./Nft";
+import { fractionalizeNft } from "../utils/cardano"
+import initLucid from "../utils/initializeLucid"
 
 const Fractionalize = () => {
   const [state, setState] = useState<'Init' | 'Loading' | 'Success'>('Init')
@@ -18,13 +20,21 @@ const Fractionalize = () => {
     setTimeout(() => setError(null), 5000)
   }
 
-  const fractionalize = () => {
+  const fractionalize = async (policy: string, name: string, fractions: number) => {
     if (state === 'Init') {
       setError(null)
       setState('Loading')
 
+      // TODO - Pass in walletApi
+      const lucid = await initLucid()
+
       //if success
-      //setState('Success')
+      try {
+        await fractionalizeNft(lucid, [policy, name], fractions)
+        setState('Success')
+      } catch (e) {
+        console.log(e)
+      }
 
       setTimeout(() => {
         setState('Init')
@@ -45,6 +55,13 @@ const Fractionalize = () => {
   const image = useAssetStore(s => s.image)
   const policyId = () => unit?.slice(0, 56)
   const assetName = () => unit ? Buffer.from(unit.slice(56), 'hex').toString('ascii') : ''
+  const policyString = policyId() || "PolicyNotFound"
+  const assetString = assetName()
+
+  const callEndpoint = async () => {
+    await fractionalize(policyString, assetString, fractions)
+  }
+
 
   return <>
       <div className="flex w-full items-center px-6 justify-center">
@@ -68,7 +85,7 @@ const Fractionalize = () => {
                   }
                   onKeyDown={(e) => {
                     if (e.key == 'Enter') {
-                      fractionalize()
+                      callEndpoint()
                     }
                   }}
                   className="
@@ -84,7 +101,7 @@ const Fractionalize = () => {
               </div>
             </div>
             <div>
-              <ActionBottom state={state} enabled={fractions ? true : false} action={fractionalize} cta="FRACTIONALIZE" successMsg="Fractionalization successful!"/>
+              <ActionBottom state={state} enabled={fractions ? true : false} action={callEndpoint} cta="FRACTIONALIZE" successMsg="Fractionalization successful!"/>
             </div>
           </div>
         </div>

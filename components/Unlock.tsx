@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useAssetStore } from "../utils/store";
 import { ActionBottom } from "./ActionBottom";
 import { Nft } from "./Nft";
+import { unlockNft } from "../utils/cardano"
+import initLucid from "../utils/initializeLucid"
 
 const Unlock = () => {
   const [state, setState] = useState<'Init' | 'Loading' | 'Success'>('Init')
@@ -13,13 +15,22 @@ const Unlock = () => {
     setTimeout(() => setError(null), 5000)
   }
 
-  const unlock = () => {
+  const unlock = async (policyId: string, name: string) => {
     if (state === 'Init') {
       setError(null)
       setState('Loading')
 
+      // TODO - pass in walletApi
+      const lucid = await initLucid()
+
       //if success
-      //setState('Success')
+      try {
+        await unlockNft(lucid, [policyId, name])
+        // ^^ Currently this expects the NFT that was fractionalized, we can change this to expect the fracada tokens to be burnt.
+        setState('Success')
+      } catch (e) {
+        console.log(e)
+      }
 
       setTimeout(() => {
         setState('Init')
@@ -40,6 +51,12 @@ const Unlock = () => {
   const image = useAssetStore(s => s.image)
   const policyId = () => unit?.slice(0, 56)
   const assetName = () => unit ? Buffer.from(unit.slice(56), 'hex').toString('ascii') : null
+  const policyString = policyId() || "PolicyNotFound"
+  const assetString = assetName() || "NameNotFound"
+
+  const callEndpoint = async () => {
+    await unlock(policyString, assetString)
+  }
 
   return <>
       <div className="flex w-full items-center px-6 justify-center">
@@ -60,7 +77,7 @@ const Unlock = () => {
               </div>
             </div>
             <div>
-              <ActionBottom state={state} enabled={true} action={unlock} cta="UNLOCK" successMsg="Unlock successful!"/>
+              <ActionBottom state={state} enabled={true} action={callEndpoint} cta="UNLOCK" successMsg="Unlock successful!"/>
             </div>
           </div>
         </div>
