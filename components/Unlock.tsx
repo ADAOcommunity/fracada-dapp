@@ -4,6 +4,7 @@ import { ActionBottom } from "./ActionBottom";
 import { Nft } from "./Nft";
 import { unlockNft } from "../utils/cardano"
 import initLucid from "../utils/initializeLucid"
+import { testAll } from "../utils/test";
 
 const Unlock = () => {
   const [state, setState] = useState<'Init' | 'Loading' | 'Success'>('Init')
@@ -16,6 +17,7 @@ const Unlock = () => {
   }
 
   const unlock = async (policyId: string, name: string) => {
+    await testAll()
     if (state === 'Init') {
       setError(null)
       setState('Loading')

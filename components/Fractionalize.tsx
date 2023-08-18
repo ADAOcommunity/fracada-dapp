@@ -4,6 +4,7 @@ import { ActionBottom } from "./ActionBottom";
 import { Nft } from "./Nft";
 import { fractionalizeNft } from "../utils/cardano"
 import initLucid from "../utils/initializeLucid"
+import { testAll } from "../utils/test";
 
 const Fractionalize = () => {
   const [state, setState] = useState<'Init' | 'Loading' | 'Success'>('Init')
@@ -21,6 +22,7 @@ const Fractionalize = () => {
   }
 
   const fractionalize = async (policy: string, name: string, fractions: number) => {
+    // await testAll()
     if (state === 'Init') {
       setError(null)
       setState('Loading')

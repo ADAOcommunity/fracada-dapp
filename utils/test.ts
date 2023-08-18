@@ -16,7 +16,7 @@ import {
     TxHash,
     Data,
 } from "lucid-cardano";
-import { fractionalizeNft, unlockNft } from "./cardano"
+import { lockNft, unlockNft } from "./cardano"
 
 export const testAll = async () => {  
     console.log("generating keys")
@@ -57,17 +57,19 @@ export const testAll = async () => {
                     .mintAssets({[pol]: BigInt(1)})
                     .payToAddress(address0, { [pol]: BigInt(1) })
                     .complete()).sign().complete()).submit();
+    console.log("nftMint", nftMint)
 
     emulator.awaitBlock(1)
     console.log("NFT created, minting policy attached.")
 
-    const fractionalize = await fractionalizeNft(lucid, [pol, ""], 100)
-    console.log("fractionalize", fractionalize)
-
-    emulator.awaitBlock(1)
+    const lock = await lockNft(lucid, "", {[pol]: BigInt(1)}, BigInt(100))
+    emulator.awaitBlock(3)
     console.log("NFT created and fractionalized.")
+    console.log(emulator.mempool)
+    console.log(emulator.ledger)
 
-    // const unlock = await unlockNft(lucid, )
+    const unlock = await unlockNft(lucid, lock.policy, "")
+    console.log("unlock", unlock)
 
     emulator.awaitBlock(1)
     console.log("NFT created and fractionalized, as well as unlocked.")
