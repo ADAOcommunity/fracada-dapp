@@ -8,7 +8,7 @@ const Comp = dynamic(() => import('../components/Fractionalize'), { ssr: false }
 const Fractionalize: NextPage = () => {
   return (
    <Layout>
-        <FracadaAction key="unlock" action="Unlock">
+        <FracadaAction key="fractionalize" action="Fractionalize">
             <Comp/>
         </FracadaAction>
    </Layout>

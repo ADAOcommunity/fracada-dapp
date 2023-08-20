@@ -84,12 +84,12 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
   const chooseAsset = async (unit: string) => {
     setLoading(true)
     try {
-      if (action === 'Unlock') {
-        const newUnit = await getNftToUnlock(unit)
+      // if (action === 'Unlock') {
+        // const newUnit = await getNftToUnlock(unit)
 
-        if(!newUnit) throw 'Could not find associated locked asset.'
-        else unit = newUnit
-      }
+        // if(!newUnit) throw 'Could not find associated locked asset.'
+        // else unit = newUnit
+      // }
       setChosenUnit(unit)
       setAsset(unit)
       const bfAsset = (await (await fetch(`${BLOCKFROST_API_URL}/assets/${unit}`, {

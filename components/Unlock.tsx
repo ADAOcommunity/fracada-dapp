@@ -15,20 +15,27 @@ const Unlock = () => {
     setError(err)
     setTimeout(() => setError(null), 5000)
   }
+  
+  function toHex(str: string) {
+    var result = '';
+    for (var i=0; i<str.length; i++) {
+      result += str.charCodeAt(i).toString(16);
+    }
+    return result;
+  }
 
   const unlock = async (policyId: string, name: string) => {
-    await testAll()
+    // await testAll()
     if (state === 'Init') {
       setError(null)
       setState('Loading')
 
       // TODO - pass in walletApi
-      const lucid = await initLucid()
+      const lucid = await initLucid(await window.cardano['nami'].enable())
 
       //if success
       try {
-        await unlockNft(lucid, [policyId, name])
-        // ^^ Currently this expects the NFT that was fractionalized, we can change this to expect the fracada tokens to be burnt.
+        await unlockNft(lucid, policyId, toHex(name))
         setState('Success')
       } catch (e) {
         console.log(e)

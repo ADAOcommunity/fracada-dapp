@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAssetStore } from "../utils/store";
 import { ActionBottom } from "./ActionBottom";
 import { Nft } from "./Nft";
-import { fractionalizeNft } from "../utils/cardano"
+import { lockNft } from "../utils/cardano"
 import initLucid from "../utils/initializeLucid"
 import { testAll } from "../utils/test";
 
@@ -22,17 +22,18 @@ const Fractionalize = () => {
   }
 
   const fractionalize = async (policy: string, name: string, fractions: number) => {
+    console.log('name', name)
     // await testAll()
     if (state === 'Init') {
       setError(null)
       setState('Loading')
 
       // TODO - Pass in walletApi
-      const lucid = await initLucid()
+      const lucid = await initLucid(await window.cardano['nami'].enable())
 
       //if success
       try {
-        await fractionalizeNft(lucid, [policy, name], fractions)
+        await lockNft(lucid, '66726163616461546f6b656e', {[`${policy}${name}`]: BigInt(1)}, BigInt(fractions))
         setState('Success')
       } catch (e) {
         console.log(e)
