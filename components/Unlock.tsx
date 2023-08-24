@@ -1,15 +1,17 @@
-import { useState } from "react";
-import { useAssetStore } from "../utils/store";
+import { useEffect, useState } from "react";
+import { useAssetStore, useWalletStore } from "../utils/store";
 import { ActionBottom } from "./ActionBottom";
 import { Nft } from "./Nft";
 import { unlockNft } from "../utils/cardano"
 import initLucid from "../utils/initializeLucid"
-import { testAll } from "../utils/test";
 
 const Unlock = () => {
-  const [state, setState] = useState<'Init' | 'Loading' | 'Success'>('Init')
+  const [state, setState] = useState<'Init' | 'Loading' | 'Success' | 'Done'>('Init')
 
   const [error, setError] = useState<string | null>(null)
+  const [txHash, setTxHash] = useState<string | null>(null)
+  
+  const { walletName } = useWalletStore()
 
   const handleSetError = (err: string) => {
     setError(err)
@@ -24,39 +26,35 @@ const Unlock = () => {
     return result;
   }
 
+  const successMsg = `Unlock successful!
+  Transaction ${txHash} was submitted to the blockchain.
+  `
+
+
   const unlock = async (policyId: string, name: string) => {
     // await testAll()
     if (state === 'Init') {
       setError(null)
       setState('Loading')
 
-      // TODO - pass in walletApi
-      const lucid = await initLucid(await window.cardano['nami'].enable())
+      const lucid = await initLucid(await window.cardano[walletName || 'nami'].enable())
 
-      //if success
       try {
-        await unlockNft(lucid, policyId, toHex(name))
+        const tx = await unlockNft(lucid, policyId, toHex(name))
+        setTxHash(tx)
         setState('Success')
       } catch (e) {
         console.log(e)
-      }
-
-      setTimeout(() => {
-        setState('Init')
-
-        //else
-        //error message is shown in ui
-        //can be multiline text
         handleSetError(`Failed unlocking`)
-
-      }, 3000)
-
+      }
     } else {
       setState('Init')
     }
   }
 
   const unit = useAssetStore(s => s.unit)
+  
+
   const image = useAssetStore(s => s.image)
   const policyId = () => unit?.slice(0, 56)
   const assetName = () => unit ? Buffer.from(unit.slice(56), 'hex').toString('ascii') : null
@@ -86,7 +84,7 @@ const Unlock = () => {
               </div>
             </div>
             <div>
-              <ActionBottom state={state} enabled={true} action={callEndpoint} cta="UNLOCK" successMsg="Unlock successful!"/>
+              <ActionBottom state={state} enabled={state !== "Success"} action={callEndpoint} cta="UNLOCK" successMsg={successMsg}/>
             </div>
           </div>
         </div>

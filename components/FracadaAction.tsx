@@ -5,7 +5,8 @@ import { ReactNode, useEffect, useState } from "react";
 import { DebounceInput } from 'react-debounce-input';
 import { Loader } from "./Loader";
 import { BLOCKFROST_API_URL, BLOCKFROST_PROJECT_ID } from "../utils/envs";
-
+import { FractionLockSpend } from "../utils/plutus";
+import { Credential } from 'lucid-cardano';
 const Buffer = buffer.Buffer
 
 type Asset = {
@@ -39,29 +40,9 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
     });
   }
 
-  const getNftToUnlock = async (fractionUnit: string) => {
-    //
-    //HERE WE SHOULD LOOK FOR MINTING TX AND GET LOCKED UNIT
-    //
-    try {
-      await delay(600)
+  const validator = new FractionLockSpend()
 
-      //FOR TESTING:
-      //FAILING LESS THEN HALF THE TIMES
-      if(Math.random() < 0.4) {
-        await delay(1000)
-        throw 'Dapp not ready. Failed searching for related unit.'
-      }
-      
-      //RANDOM SPACEBUD
-      return Promise.resolve('d5e6bf0500378d4f0da4e8dde6becec7621cd8cbf5cbb9b87013d4cc5370616365427564323536')
-    }
-    catch { 
-      setFailed(true)
-    }
-
-    return ''
-  }
+  const stakeCred: Credential = { type: "Key", hash: "a679d78da810b73f00405cbbf00e1bfb25eeb4d6303bfa58480234f1" }
 
   useEffect(() => {
     if (isConnected) loadAssets()
@@ -84,14 +65,32 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
   const chooseAsset = async (unit: string) => {
     setLoading(true)
     try {
-      // if (action === 'Unlock') {
-        // const newUnit = await getNftToUnlock(unit)
-
-        // if(!newUnit) throw 'Could not find associated locked asset.'
-        // else unit = newUnit
-      // }
       setChosenUnit(unit)
       setAsset(unit)
+      if (action === 'Unlock') {
+        console.error("UNLOCK CAUGHT")
+        const lucid = await initializeLucid(await window.cardano[walletName || 'nami'].enable())
+        const contractAddress = lucid.utils.validatorToAddress(validator, stakeCred)
+        const contractUtxos = await lucid.utxosAt(contractAddress)
+        const beaconUnit = `${unit?.slice(0, 56)}${'626561636f6e'}`
+        const contractUtxosWithBeacon = contractUtxos.filter((v) => {
+          const assets = v.assets
+          const amountOfAsset = assets[beaconUnit] // Returns 0 when not present hopefully?
+          return amountOfAsset > BigInt(0)
+        })
+        if (contractUtxosWithBeacon.length != 1) {
+          console.error( "The locked UTxO was not found.")
+          throw "The locked UTxO was not found."
+        }
+        else {
+          Object.keys(contractUtxosWithBeacon[0].assets).forEach((key) => {
+            console.error(`In a loop ${key}`)
+            if (key !== "lovelace" && key !== beaconUnit) {
+              unit = key
+            }
+          })
+        }
+      }
       const bfAsset = (await (await fetch(`${BLOCKFROST_API_URL}/assets/${unit}`, {
         headers: {
           'project_id': BLOCKFROST_PROJECT_ID
@@ -111,7 +110,7 @@ const FracadaAction = ({ children, action }: { children: ReactNode, action: 'Unl
           )
         }
       }
-    } catch(ex) { console.log(ex) }
+    } catch (ex) { console.log(ex) }
     setLoading(false)
   }
 
@@ -216,7 +215,7 @@ const AssetItem = ({ assetName, policyId, onClick }: { assetName: string, policy
   </>
 }
 
-const LoadingItems = ({currentCount}: {currentCount: number | undefined}) => {
+const LoadingItems = ({ currentCount }: { currentCount: number | undefined }) => {
 
   const isTimeout = useSearchStore((s) => s.isTimeout)
   const messageTitle = useSearchStore((s) => s.messageTitle)
@@ -224,7 +223,7 @@ const LoadingItems = ({currentCount}: {currentCount: number | undefined}) => {
   const setIsTimeout = useSearchStore((s) => s.setIsTimeout)
 
   const loadTimeoutMessage = () => {
-    if(!currentCount || currentCount == 0){
+    if (!currentCount || currentCount == 0) {
       setIsTimeout()
     }
   }
