@@ -21,7 +21,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
                     </div>
                     <footer className="py-4 pt-36 text-l">
                         <div className="container mx-auto text-center">
-                            <a href="https://docs.adaodapp.xyz/fracada-dapp/about" target='_blank' className="hover:underline">{`See Documentation ->`}</a>
+                            <a href="https://docs.adaodapp.xyz/fracada-dapp/about" rel="noreferrer" target='_blank' className="hover:underline">{`See Documentation ->`}</a>
                         </div>
                     </footer>
                 </div>
