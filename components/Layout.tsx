@@ -4,7 +4,7 @@ import WalletButton from '../components/WalletButton/fab'
 
 const Layout = ({ children }: { children: ReactNode }) => {
     return (
-        <div className={'min-h-screen'}>
+        <div className={'flex flex-col h-screen'}>
             <div className="w-full lg:max-w-lg lg:w-1/2 rounded-xl">
                 <div>
                     <div className="relative w-full max-w-lg">
@@ -16,13 +16,17 @@ const Layout = ({ children }: { children: ReactNode }) => {
             <Header />
             <section>
                 <div className="px-4 py-44 mx-auto max-w-7xl sm:px-6 md:py-56 md:px-12 lg:px-24">
-                    <div className="flex flex-col items-start mt-12 mb-16 text-left lg:flex-grow lg:pl-6 xl:pl-24 md:mb-0 xl:mt-0">
+                    <div className="flex flex-col min-h-[40vh] items-start mt-12 mb-16 text-left flex-grow lg:pl-6 xl:pl-24 md:mb-0 xl:mt-0">
                         {children}
                     </div>
+                    <footer className="py-4 pt-36 text-l">
+                        <div className="container mx-auto text-center">
+                            <a href="https://docs.adaodapp.xyz/fracada-dapp/about" target='_blank' className="hover:underline">{`See Documentation ->`}</a>
+                        </div>
+                    </footer>
                 </div>
             </section>
             <WalletButton />
-            
         </div>
     )
 }
